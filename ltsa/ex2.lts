@@ -40,8 +40,9 @@ SHIP = (ask_in -> enter -> ask_out -> exit -> END).
 
 /**
  * This is the final system
+ * `N` ships can come from either direction
  */
-|| CLOSED_POOL_WITH_TWO_SHIP_STREAMS(N=1, P=1) = (
+|| CLOSED_POOL_WITH_TWO_SHIP_STREAMS(N=2) = (
     CLOSED_POOL || HAS_SHIP || ab[k:1..N]:SHIP || ba[k:1..N]:SHIP
 ) / {
     forall[k:1..N] {
@@ -57,50 +58,3 @@ SHIP = (ask_in -> enter -> ask_out -> exit -> END).
         { ba[k].ask_out } / { a.open }
     }
 }.
-
-// SHIP = NEW,
-// NEW = (ask_in -> ASKED_IN),
-// ASKED_IN = (enter -> is_in -> IN),
-// IN = (ask_out -> ASKED_OUT),
-// ASKED_OUT = (exit -> OUT),
-// OUT = (leave -> END).
-
-// SHIP = (ask_in -> enter -> is_in -> ask_open -> exit -> leave -> END).
-
-// SHIP = (enter -> exit -> END).
-
-// || POOL_CONTROLLER = WAIT,
-// WAIT = ()
-
-// || SHIP_WITH_HAS_SHIP(N=2) = (HAS_SHIP || ab[k:1..N]:SHIP) / {
-//     forall[k:1..N] {
-//         { ab[k].enter } / fill,
-//         { ab[k].exit } / empty
-//     }
-// }.
-
-
-
-// || CONTROLLED_POOL = 
-
-// ||DOOR_SYS = (CONTROLLER || DOOR) @ {ask_open, confirm_open, is_closed}.
-// 
-// 
-// SYNCHRO = CLOSED,
-// CLOSED = (
-//     ask_open[i:1..2] -> open[i] -> OPENED[i]
-// ),
-// OPENED[i:1..2] = (
-//     ask_open[j:1..2] -> WAIT[i][j]
-//   | is_closed[j:1..2] -> if (i==j) then CLOSED else OPENED[i]
-// ),
-// WAIT[i:1..2][j:1..2] =(
-//     is_closed[k:1..2] -> if (i==k) then (open[j] -> OPENED[j]) else WAIT[i][j]
-// ).
-// 
-// 
-// ||SYS = (d[1..2]:DOOR_SYS || SYNCHRO)/{
-//     d[i:1..2].ask_open / ask_open[i],
-//     d[i:1..2].confirm_open / open[i],
-//     d[i:1..2].is_closed / is_closed[i]
-// }.
