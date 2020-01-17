@@ -1,0 +1,106 @@
+/**
+ * The final system has two doors
+ */
+DOOR = CLOSED,
+CLOSED = (is_closed -> CLOSED | open -> OPEN),
+OPEN = (is_open -> OPEN | close -> CLOSED).
+
+/**
+ * The pool has two levels
+ * it can go from level a to level b with action `a2b`
+ * and the other way around with `b2a`
+ */
+POOL = A_LEVEL,
+A_LEVEL = (is_a -> A_LEVEL | a2b -> B_LEVEL),
+B_LEVEL = (is_b -> B_LEVEL | b2a -> A_LEVEL).
+
+FILLABLE = EMPTY,
+EMPTY = (is_empty -> EMPTY | fill -> FULL),
+FULL = (is_full -> FULL | empty -> EMPTY).
+
+/**
+ * The pool can be filled by a ship or be empty
+ */
+|| HAS_SHIP = (FILLABLE).
+
+/**
+ * A closed pool is a pool with two doors
+ */
+|| CLOSED_POOL = (POOL || a:DOOR || b:DOOR) / {
+    { is_a, a.open } / is_a,
+    { is_b, b.open } / is_b,
+    { a.is_closed, a2b } / a.is_closed,
+    { b.is_closed, b2a } / b.is_closed
+}.
+
+/**
+ * A ship is active
+ */
+SHIP = (ask_in -> enter -> ask_out -> exit -> END).
+
+/**
+ * This is the final system
+ */
+|| CLOSED_POOL_WITH_TWO_SHIP_STREAMS(N=1, P=1) = (
+    CLOSED_POOL || HAS_SHIP || ab[k:1..N]:SHIP || ba[k:1..N]:SHIP
+) / {
+    forall[k:1..N] {
+        /* AB stream */
+        { a.is_open, ab[k].enter } / { a.is_open, fill },
+        { b.is_open, ab[k].exit } / { b.is_open, empty },
+        { ab[k].ask_in } / { a.open },
+        { ab[k].ask_out } / { b.open },
+        /* BA stream */
+        { b.is_open, ba[k].enter } / { b.is_open, fill },
+        { a.is_open, ba[k].exit } / { a.is_open, empty },
+        { ba[k].ask_in } / { b.open },
+        { ba[k].ask_out } / { a.open }
+    }
+}.
+
+// SHIP = NEW,
+// NEW = (ask_in -> ASKED_IN),
+// ASKED_IN = (enter -> is_in -> IN),
+// IN = (ask_out -> ASKED_OUT),
+// ASKED_OUT = (exit -> OUT),
+// OUT = (leave -> END).
+
+// SHIP = (ask_in -> enter -> is_in -> ask_open -> exit -> leave -> END).
+
+// SHIP = (enter -> exit -> END).
+
+// || POOL_CONTROLLER = WAIT,
+// WAIT = ()
+
+// || SHIP_WITH_HAS_SHIP(N=2) = (HAS_SHIP || ab[k:1..N]:SHIP) / {
+//     forall[k:1..N] {
+//         { ab[k].enter } / fill,
+//         { ab[k].exit } / empty
+//     }
+// }.
+
+
+
+// || CONTROLLED_POOL = 
+
+// ||DOOR_SYS = (CONTROLLER || DOOR) @ {ask_open, confirm_open, is_closed}.
+// 
+// 
+// SYNCHRO = CLOSED,
+// CLOSED = (
+//     ask_open[i:1..2] -> open[i] -> OPENED[i]
+// ),
+// OPENED[i:1..2] = (
+//     ask_open[j:1..2] -> WAIT[i][j]
+//   | is_closed[j:1..2] -> if (i==j) then CLOSED else OPENED[i]
+// ),
+// WAIT[i:1..2][j:1..2] =(
+//     is_closed[k:1..2] -> if (i==k) then (open[j] -> OPENED[j]) else WAIT[i][j]
+// ).
+// 
+// 
+// ||SYS = (d[1..2]:DOOR_SYS || SYNCHRO)/{
+//     d[i:1..2].ask_open / ask_open[i],
+//     d[i:1..2].confirm_open / open[i],
+//     d[i:1..2].is_closed / is_closed[i]
+// }.
