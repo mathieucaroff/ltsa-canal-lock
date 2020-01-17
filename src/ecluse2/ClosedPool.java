@@ -19,6 +19,13 @@ public class ClosedPool {
 	private Pool pool;
 	
 	
+	public ClosedPool(Door a, Door b, Pool pool) {
+		this.pool = pool;
+		door1 = a;
+		door2 = b;
+	}
+	
+	
 	public synchronized void open_a() {
 		pool.is_a();
 		door1.open();
