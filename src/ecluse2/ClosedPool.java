@@ -36,12 +36,20 @@ public class ClosedPool {
 		door2.open();
 	}
 	
-	public synchronized void a_is_closed() {
+	public synchronized void close_a() {
+		door1.close();
+	}
+	
+	public synchronized void close_b() {
+		door2.close();
+	}
+	
+	public synchronized void a2b() {
 		door1.is_closed();
 		pool.a2b();
 	}
 	
-	public synchronized void b_is_closed() {
+	public synchronized void b2a() {
 		door2.is_closed();
 		pool.b2a();
 	}
